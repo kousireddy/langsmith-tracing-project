@@ -1,37 +1,12 @@
-from dotenv import load_dotenv
-from groq import Groq
+from utils.config import *
 from langsmith import traceable
 
-load_dotenv()
-
-# Groq Client
-client = Groq()
-
-
-@traceable(run_type="tool")
-def get_context(question: str) -> str:
-    """
-    Simulated tool call.
-    """
-    return """
-    LangSmith traces are stored for 14 days
-    on the Developer plan.
-    """
-
-
-@traceable(run_type="llm")
-def call_groq(messages):
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=messages,
-        temperature=0.7
-    )
-
-    return response.choices[0].message.content
+from tools.context_tool import get_context
+from llm.groq_client import call_groq
 
 
 @traceable
-def assistant(question: str) -> str:
+def assistant(question: str):
 
     context = get_context(question)
 
